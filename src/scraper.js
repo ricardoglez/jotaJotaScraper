@@ -72,10 +72,9 @@ const fetchLyricsList = async ( lyricsObj ) => {
                     let $lyric = await fetchLyric( lyric );
                     if( typeof $lyric == 'function' ){
 
-                        if(  fs.existsSync(`./data/lyrics/${lyric.filename}.json`) ){
+                        if( fs.existsSync(`./data/lyrics/${lyric.filename}.json`) ){
                             console.log( 'File '+ lyric.filename + ' already exist');
                             return new Error('File '+ lyric.filename + ' already exist');
-                        
                         }
                         else {
                             let lyricsParragraphs = $lyric( lyricDivSelector );
@@ -85,7 +84,7 @@ const fetchLyricsList = async ( lyricsObj ) => {
                                 if( lyricsParragraphs[key].name === 'p' ){
                                     lyricData.filename = lyric.filename;
                                     lyricData.id       = lyric.id;
-                                    lyricData.data     = [...lyricData.data, cheerio(lyricsParragraphs[key]).text()+' ' ]
+                                    lyricData.data     = [...lyricData.data, cheerio(lyricsParragraphs[key]).text()+' ']
                                 }
                             } )
 
