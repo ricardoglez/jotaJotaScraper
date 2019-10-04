@@ -2,7 +2,7 @@ const { getAvailableSongList, fetchLyricsList } = require('./src/scraper');
 const { convertListToFile } = require('./src/converter');
 const fs = require('fs');
 
-let isTop20 = true;
+let isTop20 = false;
 
 let dataFolder = './data';
 
@@ -23,14 +23,14 @@ const init = async () => {
                 if( availableList ){
                     try{
                         let resultConvert = await convertListToFile( availableList, null, isTop20 );
-                        console.log(resultConvert.message);
-                        console.log(resultConvert);
+                        //console.log(resultConvert.message);
+                        //console.log(resultConvert);
                         if( resultConvert.success){
                             fs.readFile( `${ dataFolder }/${resultConvert.newFile}`, 'utf-8', ( err, data ) => {
                                 if( err ){  console.error(err); }
-                                console.log( data );
+                          //      console.log( data );
                                 let parsedJSON = JSON.parse( data );
-                                console.log(resultConvert.newFile, ' file Loaded...');
+                            //    console.log(resultConvert.newFile, ' file Loaded...');
                                 fetchLyricsList( parsedJSON );
                               });
                         }
@@ -54,7 +54,7 @@ const init = async () => {
                     console.log( firstFile , 'Load This file...');
                     fs.readFile( `${ dataFolder }/${firstFile}`, 'utf-8', ( err, data ) => {
                         if( err ){  console.error(err); }
-                        console.log('File Loaded');
+                       // console.log('File Loaded');
                         let parsedJSON = JSON.parse(data);
                         fetchLyricsList( parsedJSON );
                     });

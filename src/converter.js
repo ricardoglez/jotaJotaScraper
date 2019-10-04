@@ -40,13 +40,13 @@ const convertLyricsToFile = async ( data ) => {
             let filename = data.filename;
             data.bow = [].concat(  ...data.data.map( p => {return  p.split(' ') } ) ); 
             let jsonString = JSON.stringify( data );
-            console.log('BOW',data.bow);
 
                 if( fs.existsSync(`./data/lyrics/${filename}`) ){
                     //File already Exist
                     rej( new Error(`File ${ filename } already exist`) );
                 }
                 else {
+                    console.log('Write this file:',filename);
                     fs.writeFileSync(`./data/lyrics/${filename}.json`, jsonString, 'utf-8');
                     res( {success: true , message: `File ${ filename } was written successfully`} )
                 }

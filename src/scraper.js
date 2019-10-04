@@ -40,10 +40,16 @@ const getAvailableSongList = async ( isTop20 ) => {
             if(  item.children &&  typeof item.children != 'function' && item.children.length > 0){
                 item.children.forEach( ch => {
                     if( ch.type === 'tag' && ch.name === 'a'){
+                        console.log( cheerio(ch).html() );
                         obj.name  = cheerio(ch).attr('title');
                         obj.path  = cheerio(ch).attr('href');
                         obj.id    = cheerio(ch).attr('href').split('/')[2];
-                        obj.filename= cheerio(ch).attr('title').split('/')[0].replace(/ /g,'_').toLowerCase();
+                        if( isTop20 ){
+                            obj.filename= cheerio(ch).attr('title').split('/')[0].replace(/ /g,'_').toLowerCase();
+                        }else {
+                            obj.filename= cheerio(ch).text().replace(/ /g,'_').toLowerCase();
+                        }
+                        obj.filename = obj.filename.replace(/[?|¿|!|¡]/g,''); 
                     }
                 } );
                 tracksObjects[ idx ] = obj ;           
@@ -68,16 +74,17 @@ const fetchLyricsList = async ( lyricsObj ) => {
             (async () => {
                 try{
                     let lyric = lyricsObj[key];
-                    console.log('Lyric:', lyric);
+                    //console.log('Lyric:', lyric);
                     let $lyric = await fetchLyric( lyric );
                     if( typeof $lyric == 'function' ){
 
                         if( fs.existsSync(`./data/lyrics/${lyric.filename}.json`) ){
-                            console.log( 'File '+ lyric.filename + ' already exist');
+                            //console.log( 'File '+ lyric.filename + ' already exist');
                             return new Error('File '+ lyric.filename + ' already exist');
                         }
                         else {
                             let lyricsParragraphs = $lyric( lyricDivSelector );
+                            cheerio(lyricsParragraphs).find('br').replaceWith(' '); 
                             let lyricTitle = $lyric( lyricTitleSelector ).text();
                             lyricData['title'] = lyricTitle;
                             Object.keys( lyricsParragraphs ).forEach( key => {
@@ -87,9 +94,8 @@ const fetchLyricsList = async ( lyricsObj ) => {
                                     lyricData.data     = [...lyricData.data, cheerio(lyricsParragraphs[key]).text()+' ']
                                 }
                             } )
-
                             let resultLyric  = await convertLyricsToFile( lyricData );
-                            console.log( resultLyric.message );
+                      //      console.log( resultLyric.message );
                             return resultLyric
                         }
                     }
