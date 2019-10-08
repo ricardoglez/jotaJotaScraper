@@ -2,7 +2,7 @@ const { getAvailableSongList, fetchLyricsList } = require('./src/scraper');
 const { convertListToFile } = require('./src/converter');
 const fs = require('fs');
 
-let isTop20 = false;
+let isTop20 = true;
 
 let dataFolder = './data';
 
@@ -17,6 +17,7 @@ const init = async () => {
     
     fs.readdir(dataFolder, (err, files) => {
         if( err || files.length < 1 || !files ){
+            fs.mkdirSync('./data');
             (async () => {
                 console.log('Get Song List...');
                 let availableList = await getAvailableSongList( isTop20 );
