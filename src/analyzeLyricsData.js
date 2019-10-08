@@ -1,6 +1,7 @@
 const lorca  = require('lorca-nlp');
 const fs  = require('fs');
 const util = require('util');
+const API = require('./api/API');
 
 const readFile = util.promisify(fs.readFile );
 const availableLyrics = []; 
@@ -18,48 +19,63 @@ const getLyricsList = () => {
     } );
 }
 
-const getLyricsData = ( lyricsList ) => {
+const getLyricsData = ( lyric ) => {
     let processedLyrics = [];
     return new Promise ( ( resolve, reject ) => {
-        for( const lyric of lyricsList ){
+        let idx = 0;
             readFile( `./data/lyrics/${lyric}`, 'utf-8')
             .then( responseL => {
-                let obj={ lyricName: lyric, parragraphs: { }, };
                 let parsedData = JSON.parse( responseL );
+                let obj={ name: lyric, parragraphs: { }, id: parsedData.id };
                 let idx = 0;
                 for( const p of parsedData.data ) {
+
                     let pStemmed =  lorca(p).words().stem().get();
                     let par = { 
                         index: idx,
-                        string: pStemmed.join(' '),
-                        sentiment: lorca( pStemmed.join(' ') ).sentiment(),
+                        string: p,
+                        sentiment: lorca( p ).sentiment(),
                     }
                     obj.parragraphs[idx] = par;
                     processedLyrics.push(obj)
                     idx ++;
-                } ;
+                };
+               
+                resolve({ success: true , data: obj });
+
             } )
             .catch( error => {
                 console.error( error );
             });
-        }
-        resolve('Process:', processedLyrics );
+        //     idx ++;
+
+        // }
     } )
 }
 
 const init = () => {
     console.log('Initilize Analysis...');
+    
     getLyricsList()
      .then( response => {
         if( response.success ){
-            getLyricsData( response.data )
-            .then( responseData => {
-                console.log(responseData);
-            } )
-            .catch( error => {
-                console.error(error);
-                throw error
-            } )
+            for( const l of response.data){
+                getLyricsData( l )
+                .then( responseData => {
+                    API.storeLyric(responseData)
+                    .then( response =>{
+                        console.log('RRESPONSE Success' );
+                    })
+                    .catch(error => {
+                        console.error('ERROR');
+                })
+
+                } )
+                .catch( error => {
+                    console.error(error);
+                    throw error
+                } )
+            }
         }
         else {
             console.error(response);
