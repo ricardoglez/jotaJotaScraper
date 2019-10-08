@@ -40,7 +40,6 @@ const getAvailableSongList = async ( isTop20 ) => {
             if(  item.children &&  typeof item.children != 'function' && item.children.length > 0){
                 item.children.forEach( ch => {
                     if( ch.type === 'tag' && ch.name === 'a'){
-                        console.log( cheerio(ch).html() );
                         obj.name  = cheerio(ch).attr('title');
                         obj.path  = cheerio(ch).attr('href');
                         obj.id    = cheerio(ch).attr('href').split('/')[2];

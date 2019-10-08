@@ -12,10 +12,13 @@ const convertListToFile = async ( data, fileName, isTop20 ) => {
         let jsonString = JSON.stringify( data );
         try{
             if( fs.existsSync( fileName ) ){
+                console.log('Lyrics List File Exist!')
                 fs.writeFileSync(`./data/${fileName}.json`, jsonString, 'utf-8');
                 res( { success: true, message: `Data was written successfully in: /data/${fileName}.json `, newFile: fileName+'.json' } );    
             }
             else {
+                console.log('Lyrics List File Doesnt Exist : (')
+
                 fs.appendFile(`./data/${fileName}.json`, jsonString, ( err ) => {
                     console.error( err );
                     rej( err );
